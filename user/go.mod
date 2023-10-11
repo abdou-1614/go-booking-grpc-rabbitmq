@@ -10,7 +10,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
-	github.com/jackc/pgx/v4 v4.10.1
+	github.com/jackc/pgx/v4 v4.18.1
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/opentracing-contrib/go-grpc v0.0.0-20200813121455-4a6760c71486
 	github.com/opentracing/opentracing-go v1.2.0
@@ -18,23 +18,41 @@ require (
 	github.com/prometheus/client_golang v0.9.3
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.17.0
-	github.com/streadway/amqp v1.0.0
+	github.com/streadway/amqp v1.1.0
 	github.com/swaggo/echo-swagger v1.1.0
 	github.com/swaggo/swag v1.7.0
-	github.com/uber/jaeger-client-go v2.25.0+incompatible
+	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.0+incompatible
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.13.0
 	google.golang.org/grpc v1.58.2
 	google.golang.org/protobuf v1.31.0
 )
 
 require (
+	github.com/golang/glog v1.1.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 // indirect
+	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgconn v1.14.0 // indirect
+	github.com/jackc/pgio v1.0.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgtype v1.14.0 // indirect
+	github.com/jackc/puddle v1.3.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	golang.org/x/sync v0.3.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0 // indirect
+)
+
+require (
 	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-openapi/spec v0.20.2 // indirect
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
+	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
+	github.com/jackc/pgx/v5 v5.4.3
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -54,7 +72,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.9.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.15.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
