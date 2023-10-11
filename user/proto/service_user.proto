@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package userService;
+
+import "rpc_create_user.proto";
+
+option go_package = ".;userService";
+
+service UserService {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
+}
