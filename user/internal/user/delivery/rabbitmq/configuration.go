@@ -31,10 +31,10 @@ const (
 
 	UserExchange = "users"
 
-	AvatarQueueName    = "avatar_queue"
-	AvatarConsumerName = "user_avatar_consumer"
-	AvatarWorker       = 5
-	AvatarsBindingKey  = "update_avatar_key"
+	AvatarQueueName   = "avatar_queue"
+	AvatarConsumerTag = "user_avatar_consumer"
+	AvatarWorker      = 5
+	AvatarsBindingKey = "update_avatar_key"
 )
 
 var (
