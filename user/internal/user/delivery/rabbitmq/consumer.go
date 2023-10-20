@@ -5,6 +5,8 @@ import (
 	"Go-grpc/internal/user"
 	"Go-grpc/pkg/logger"
 	"Go-grpc/pkg/rabbitmq"
+	"context"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
@@ -101,4 +103,62 @@ func (c *UserConsumer) CreateExchangeAndQueue(exchangeName, queueName, bindingKe
 	}
 
 	return amqpChann, nil
+}
+
+func (c *UserConsumer) startConsumer(
+	ctx context.Context,
+	workerPoolSize int,
+	queueName string,
+	consumerTag string,
+	worker func(ctx context.Context, wg *sync.WaitGroup, message <-chan amqp.Delivery),
+) error {
+	amqpChann, err := c.amqpConn.Channel()
+
+	if err != nil {
+		return errors.Wrap(err, "c.amqpConn.Channel")
+	}
+
+	deliveries, err := amqpChann.Consume(
+		queueName,
+		consumerTag,
+		consumeAutoAck,
+		consumeExclusive,
+		consumeNoLocal,
+		consumeNoWait,
+		nil,
+	)
+
+	if err != nil {
+		return errors.Wrap(err, "amqpChann.Consume")
+	}
+
+	wg := &sync.WaitGroup{}
+
+	wg.Add(workerPoolSize)
+	for i := 0; i < workerPoolSize; i++ {
+		go worker(ctx, wg, deliveries)
+	}
+
+	amqpChannError := <-amqpChann.NotifyClose(make(chan *amqp.Error))
+
+	c.logger.Errorf("amqpChann.NotifyClose : %s", amqpChannError)
+
+	wg.Wait()
+
+	return amqpChannError
+}
+
+func (c *UserConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
+	go func() {
+		if err := c.startConsumer(
+			ctx,
+			AvatarWorker,
+			AvatarQueueName,
+			AvatarConsumerTag,
+			c.imagesWorker,
+		); err != nil {
+			c.logger.Errorf("StartResizeConsumer: %v", err)
+			cancel()
+		}
+	}()
 }
