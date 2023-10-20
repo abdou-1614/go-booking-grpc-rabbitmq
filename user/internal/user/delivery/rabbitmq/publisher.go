@@ -94,7 +94,7 @@ func (p *UserPublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey s
 }
 
 func (p *UserPublisher) Publish(ctx context.Context, exchange, routingKey, contentType string, header amqp.Table, body []byte) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPublisher.Publish")
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserPublisher.Publish")
 
 	defer span.Finish()
 
