@@ -4,7 +4,7 @@ import (
 	"Go-grpc/config"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 func NewRedisClient(cfg *config.Config) *redis.Client {
