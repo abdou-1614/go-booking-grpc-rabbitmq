@@ -33,7 +33,7 @@ func NewUserUseCase(userPGRepo user.PGRepository, log logger.Loggor, redRepo use
 	}
 }
 
-func (u *userUseCase) Regiser(ctx context.Context, user *model.User) (*model.UserResponse, error) {
+func (u *userUseCase) Register(ctx context.Context, user *model.User) (*model.UserResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.Register")
 
 	defer span.Finish()
