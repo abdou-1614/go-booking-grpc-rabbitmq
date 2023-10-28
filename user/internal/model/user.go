@@ -2,6 +2,7 @@ package model
 
 import (
 	"Go-grpc/pkg/types"
+	"fmt"
 	"strings"
 	"time"
 
@@ -63,6 +64,18 @@ const (
 
 func (e *Role) ToString() string {
 	return string(*e)
+}
+
+func (e *Role) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Role(s)
+	case string:
+		*e = Role(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Role: %T", src)
+	}
+	return nil
 }
 
 func (u *User) HashPassword() error {
