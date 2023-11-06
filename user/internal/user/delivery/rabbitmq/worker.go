@@ -12,28 +12,11 @@ func (c *UserConsumer) imagesWorker(ctx context.Context, wg *sync.WaitGroup, mes
 	defer wg.Done()
 
 	for delivery := range messages {
-		span, ctx := opentracing.StartSpanFromContext(ctx, "ImageConsumer.resizeWorker")
+		span, _ := opentracing.StartSpanFromContext(ctx, "ImageConsumer.resizeWorker")
 
 		c.logger.Infof("processDeliveries deliveryTag% v", delivery.DeliveryTag)
 
 		incomingMessages.Inc()
-
-		err := c.userUC.UpdateUploadedAvatar(ctx, delivery)
-		if err != nil {
-			if err := delivery.Reject(false); err != nil {
-				c.logger.Errorf("Err delivery.Reject: %v", err)
-			}
-			c.logger.Errorf("Failed to process delivery: %v", err)
-			errorMessages.Inc()
-		} else {
-			err = delivery.Ack(false)
-			if err != nil {
-				c.logger.Errorf("Failed to acknowledge delivery: %v", err)
-				errorMessages.Inc()
-				continue
-			}
-			successMessages.Inc()
-		}
 		span.Finish()
 	}
 
