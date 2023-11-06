@@ -12,3 +12,9 @@ local:
 	docker-compose -f docker-compose.local.yml up --build
 
 # ==============================================================================
+
+
+# Run Listner For All Services
+
+listner:
+	cd user && golangci-lint run
