@@ -6,7 +6,9 @@ WORKDIR /app
 
 COPY . /app
 
-RUN go mode download
+RUN go mod tidy && go mod vendor
+
+RUN go mod download
 
 RUN go get github.com/githubnemo/CompileDaemon
 
