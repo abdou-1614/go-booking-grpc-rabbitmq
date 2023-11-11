@@ -20,9 +20,9 @@ services:
     restart: always
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=user_db
-      - POSTGRES_HOST=5433
+      - POSTGRES_PASSWORD=bG3C1g*A54ac5Cfcff6-gECF-GE6*e-b
+      - POSTGRES_DB=railway
+      - POSTGRES_HOST=monorail.proxy.rlwy.net
     command: -p 5433
     volumes:
       - ./user_pgdata:/var/lib/postgresql/data
@@ -84,33 +84,6 @@ services:
       - '5672:5672'
       # HTTP management UI
       - '15672:15672'
-
-  minio:
-    image: minio/minio:latest
-    ports:
-      - '9000:9000'
-    container_name: minio_aws
-    environment:
-      MINIO_ACCESS_KEY: minio123
-      MINIO_SECRET_KEY: minio123
-    command: server /data
-    networks:
-      - hotels_network
-
-  mc:
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://myminio:9000 minio123 minio123;
-      /usr/bin/mc rb --force local/images/;
-      /usr/bin/mc mb --quiet local/images/;
-      /usr/bin/mc policy set public local/images;
-      "
-    networks:
-      - hotels_network
 
 
 volumes:
