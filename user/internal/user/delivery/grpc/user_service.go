@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/opentracing/opentracing-go"
-	"github.com/pkg/errors"
 )
 
 type UserGRPCService struct {
@@ -33,20 +32,11 @@ func (u *UserGRPCService) CreateUser(ctx context.Context, req *userService.Creat
 
 	defer span.Finish()
 
-	var userModel *model.User
-
-	if err := userModel.PrepareToCreate(); err != nil {
-		return nil, errors.Wrap(err, "UserGRPCService.PrepareToCreate")
-	}
-
-	role := model.Role(req.GetRole())
-
 	user := &model.User{
 		FirstName: req.GetFirstName(),
 		LastName:  req.GetLastName(),
 		Email:     req.GetEmail(),
 		Password:  req.GetPassword(),
-		Role:      &role,
 	}
 
 	if err := u.validate.StructCtx(ctx, user); err != nil {
