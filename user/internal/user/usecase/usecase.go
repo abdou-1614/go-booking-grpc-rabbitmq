@@ -35,18 +35,16 @@ func NewUserUseCase(userPGRepo user.PGRepository, log logger.Loggor, redRepo use
 
 func (u *userUseCase) Register(ctx context.Context, user *model.User) (*model.UserResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.Register")
-
 	defer span.Finish()
 
 	if err := user.PrepareToCreate(); err != nil {
-		return nil, errors.Wrap(err, "user.PrepareToCreate")
+		return nil, errors.Wrap(err, "user.PrepareCreate")
 	}
 
 	created, err := u.userPGRepo.Create(ctx, user)
-
 	if err != nil {
 		return nil, errors.Wrap(err, "userPGRepo.Create")
 	}
 
-	return created, nil
+	return created, err
 }
