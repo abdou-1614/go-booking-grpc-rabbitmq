@@ -10,31 +10,14 @@ import (
 type Config struct {
 	GRPCServer GRPCServer
 	HttpServer HttpServer
-	RabbitMQ   RabbitMQ
-	Redis      RedisConfig
-	Logger     Logger
 	Postgres   PostgresConfig
-	Jaeger     Jaeger
+	Redis      RedisConfig
 	Metrics    Metrics
+	Logger     Logger
+	Jaeger     Jaeger
+	RabbitMQ   RabbitMQ
 }
 
-type GRPCServer struct {
-	AppVersion             string
-	Port                   string
-	CookieLifeTime         int
-	AccessTokenExpire      int
-	SessionID              string
-	RefreshTokenExpire     int
-	Mode                   string
-	SessionPrefix          string
-	CSRFPrefix             string
-	Timeout                time.Duration
-	ReadTimeout            time.Duration
-	WriteTimeout           time.Duration
-	MaxConnectionIdle      time.Duration
-	MaxConnectionAge       time.Duration
-	SessionGrpcServicePort string
-}
 type HttpServer struct {
 	Port              string
 	PprofPort         string
@@ -45,17 +28,31 @@ type HttpServer struct {
 	SessionCookieName string
 }
 
+// GRPCServer config
+type GRPCServer struct {
+	AppVersion             string
+	Port                   string
+	CookieLifeTime         int
+	CsrfExpire             int
+	SessionID              string
+	SessionExpire          int
+	Mode                   string
+	SessionPrefix          string
+	CSRFPrefix             string
+	Timeout                time.Duration
+	ReadTimeout            time.Duration
+	WriteTimeout           time.Duration
+	MaxConnectionIdle      time.Duration
+	MaxConnectionAge       time.Duration
+	SessionGrpcServicePort string
+}
+
 // RabbitMQ
 type RabbitMQ struct {
-	Host           string
-	Port           string
-	User           string
-	Password       string
-	Exchange       string
-	Queue          string
-	RoutingKey     string
-	ConsumerTag    string
-	WorkerPoolSize int
+	Host     string
+	Port     string
+	User     string
+	Password string
 }
 
 // Logger config
@@ -93,6 +90,7 @@ type RedisConfig struct {
 
 // Metrics config
 type Metrics struct {
+	Port        string
 	URL         string
 	ServiceName string
 }
@@ -106,7 +104,7 @@ type Jaeger struct {
 
 func LoadConfig(fileName string) (*viper.Viper, error) {
 	v := viper.New()
-	v.SetConfigFile(fileName)
+	v.SetConfigName(fileName)
 	v.AddConfigPath(".")
 	v.AutomaticEnv()
 	if err := v.ReadInConfig(); err != nil {
@@ -149,8 +147,7 @@ func GetConfig(configFile string) (*Config, error) {
 
 func GetConfigPath(configPath string) string {
 	if configPath == "docker" {
-		return "./config/config-docker"
+		return "../config/config-docker"
 	}
-
-	return "./config/config-docker"
+	return "../config/config-local"
 }
