@@ -37,6 +37,17 @@ const (
 	userCacheDuration = time.Minute * 15
 )
 
+type HelloService struct {
+	userGRPCService.UnimplementedHelloServiceServer
+}
+
+func (s *HelloService) SayHello(ctx context.Context, in *userGRPCService.HelloRequest) (*userGRPCService.HelloResponse, error) {
+	return &userGRPCService.HelloResponse{
+		Message: "Hello From the Server !",
+		Name:    in.Name,
+	}, nil
+}
+
 type Server struct {
 	logger    logger.Loggor
 	cfg       *config.Config
@@ -114,6 +125,7 @@ func (s *Server) Run() error {
 
 	userService := userGRPC.NewUserGRPCService(userUseCase, s.logger, validate)
 	userGRPCService.RegisterUserServiceServer(server, userService)
+	userGRPCService.RegisterHelloServiceServer(server, new(HelloService))
 	grpc_prometheus.Register(server)
 
 	go func() {
@@ -121,7 +133,7 @@ func (s *Server) Run() error {
 		s.logger.Fatal(server.Serve(l))
 	}()
 
-	if s.cfg.GRPCServer.Mode != "production" {
+	if s.cfg.GRPCServer.Mode != "Production" {
 		reflection.Register(server)
 	}
 
