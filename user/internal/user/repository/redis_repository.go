@@ -14,17 +14,13 @@ import (
 )
 
 type userRedisRepository struct {
-	redis      *redis.Client
+	redisConn  *redis.Client
 	prefix     string
 	expiration time.Duration
 }
 
-func NewUserRedisRepository(redis *redis.Client, prefix string, expiration time.Duration) *userRedisRepository {
-	return &userRedisRepository{
-		redis:      redis,
-		prefix:     prefix,
-		expiration: expiration,
-	}
+func NewUserRedisRepository(redisConn *redis.Client, prefix string, expiration time.Duration) *userRedisRepository {
+	return &userRedisRepository{redisConn: redisConn, prefix: prefix, expiration: expiration}
 }
 
 func (u *userRedisRepository) SaveUser(ctx context.Context, user *model.UserResponse) error {
@@ -38,7 +34,7 @@ func (u *userRedisRepository) SaveUser(ctx context.Context, user *model.UserResp
 		return errors.Wrap(err, "userRedisRepository.SaveUser.json.Marshal")
 	}
 
-	if err := u.redis.SetEx(ctx, u.createKey(user.ID), string(userBytes), u.expiration).Err(); err != nil {
+	if err := u.redisConn.SetEx(ctx, u.createKey(user.ID), string(userBytes), u.expiration).Err(); err != nil {
 		return errors.Wrap(err, "userRedisRepository.SaveUser.json.Marshal")
 	}
 
