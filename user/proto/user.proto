@@ -12,8 +12,7 @@ message User {
     string FirstName = 2;
     string LastName = 3;
     string Email = 4;
-    string Avatar = 5;
-    string Role = 6;
+    string Role = 5;
     google.protobuf.Timestamp CreatedAt = 7;
     google.protobuf.Timestamp UpdatedAt = 8;
 }
