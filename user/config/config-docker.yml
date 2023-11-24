@@ -1,9 +1,9 @@
 GRPCServer:
   AppVersion: 1.0.0
-  Port: ":5001"
+  Port: ":5003"
   CookieLifeTime: 360
-  AccessTokenExpire: 15
-  RefreshTokenExpire: 60
+  CsrfExpire: 15
+  SessionExpire: 60
   SessionID: "SessionID"
   Mode: "Development"
   Timeout: 15
@@ -15,8 +15,14 @@ GRPCServer:
   CSRFPrefix: "csrf"
   SessionGrpcServicePort: ":5000"
 
+Rabbitmq:
+  Host: localhost
+  Port: 5672
+  User: guest
+  Password: guest
+
 HttpServer:
-  Port: ":8081"
+  Port: ":8007"
   PprofPort: ":8100"
   Timeout: 15
   ReadTimeout: 5
@@ -24,16 +30,14 @@ HttpServer:
   CookieLifeTime: 44640
   SessionCookieName: "session_token"
 
-rabbitmq:
-  Host: localhost
-  Port: 5672
-  User: guest
-  Password: guest
-  Exchange: emails-exchange
-  Queue: emails-queue
-  RoutingKey: emails-routing-key
-  ConsumerTag: emails-consumer
-  WorkerPoolSize: 24
+postgres:
+  PostgresqlHost: roundhouse.proxy.rlwy.net
+  PostgresqlPort: 57236
+  PostgresqlUser: postgres
+  PostgresqlPassword: B4C*3AE3B5FdE5c55Edc*13eb56GFDc1
+  PostgresqlDbname: railway
+  PostgresqlSslmode: "disable"
+  PgDriver: pgx
 
 logger:
   Development: true
@@ -42,14 +46,6 @@ logger:
   Encoding: json
   Level: info
 
-postgres:
-  PostgresqlHost: localhost
-  PostgresqlPort: 5433
-  PostgresqlUser: postgres
-  PostgresqlPassword: postgres
-  PostgresqlDbname: user_db
-  PostgresqlSslmode: "disable"
-  PgDriver: pgx
 
 redis:
   RedisAddr: localhost:6379
@@ -63,10 +59,11 @@ redis:
   DB: 0
 
 metrics:
-  Url: 0.0.0.0:7071
-  ServiceName: user_microservice
+  Port: ":7073"
+  Url: 0.0.0.0:7073
+  ServiceName: hotels_microservice
 
 jaeger:
   Host: localhost:6831
-  ServiceName: UserService_GRPC
+  ServiceName: HotelsService_GRPC
   LogSpans: false
