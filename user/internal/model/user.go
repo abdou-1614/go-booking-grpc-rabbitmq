@@ -1,7 +1,6 @@
 package model
 
 import (
-	"Go-grpc/pkg/types"
 	"fmt"
 	"strings"
 	"time"
@@ -14,52 +13,40 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID            `json:"user_id"`
-	FirstName string               `json:"first_name" validate:"required,min=3,max=25"`
-	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
-	Email     string               `json:"email" validate:"required,email"`
-	Password  string               `json:"password" validate:"required,min=6,max=250"`
-	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
-	Role      *Role                `json:"role"`
-	CreatedAt *time.Time           `json:"created_at"`
-	UpdatedAt *time.Time           `json:"updated_at"`
+	ID        uuid.UUID  `json:"id"`
+	FirstName string     `json:"first_name" validate:"required,min=3,max=25"`
+	LastName  string     `json:"last_name" validate:"required,min=3,max=25"`
+	Email     string     `json:"email" validate:"required,email"`
+	Role      *Role      `json:"role"`
+	Password  string     `json:"password" validate:"required,min=6,max=250"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 }
 
 type CreateUserRequest struct {
-	FirstName string               `json:"first_name" validate:"required,min=3,max=25"`
-	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
-	Email     string               `json:"email" validate:"required,email"`
-	Password  string               `json:"password" validate:"required,min=6,max=250"`
-	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
-	Role      *Role                `json:"role"`
+	FirstName string `json:"first_name" validate:"required,min=3,max=25"`
+	LastName  string `json:"last_name" validate:"required,min=3,max=25"`
+	Email     string `json:"email" validate:"required,email"`
+	Password  string `json:"password" validate:"required,min=6,max=250"`
+	Role      *Role  `json:"role"`
 }
 
 type UserResponse struct {
-	ID        uuid.UUID            `json:"user_id"`
-	FirstName string               `json:"first_name" validate:"required,min=3,max=25"`
-	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
-	Email     string               `json:"email" validate:"required,email"`
-	Role      *Role                `json:"role"`
-	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
-	CreatedAt *time.Time           `json:"created_at"`
-	UpdatedAt *time.Time           `json:"updated_at"`
-}
-
-type UserUpdate struct {
-	UserID    uuid.UUID `json:"user_id"`
-	FirstName string    `json:"first_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
-	LastName  string    `json:"last_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
-	Email     string    `json:"email" validate:"omitempty,email" swaggertype:"string"`
-	Avatar    string    `json:"avatar" validate:"max=250" swaggertype:"string"`
-	Role      *Role     `json:"role"`
+	ID        uuid.UUID  `json:"id"`
+	FirstName string     `json:"first_name" validate:"required,min=3,max=25"`
+	LastName  string     `json:"last_name" validate:"required,min=3,max=25"`
+	Email     string     `json:"email" validate:"required,email"`
+	Role      *Role      `json:"role"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 }
 
 type Role string
 
 const (
-	RoleGuest   Role = "guest"
-	RoleAdmin   Role = "admin"
-	RoleMemeber Role = "memeber"
+	RoleGuest  Role = "guest"
+	RoleMember Role = "member"
+	RoleAdmin  Role = "admin"
 )
 
 func (e *Role) ToString() string {
@@ -76,6 +63,13 @@ func (e *Role) Scan(src interface{}) error {
 		return fmt.Errorf("unsupported scan type for Role: %T", src)
 	}
 	return nil
+}
+
+type UserUpdate struct {
+	UserID    uuid.UUID `json:"id"`
+	FirstName string    `json:"first_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
+	LastName  string    `json:"last_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
+	Email     string    `json:"email" validate:"omitempty,email" swaggertype:"string"`
 }
 
 func (u *User) HashPassword() error {
@@ -115,7 +109,6 @@ func (u *UserResponse) ToProto() *userService.User {
 		FirstName: u.FirstName,
 		LastName:  u.LastName,
 		Email:     u.Email,
-		Avatar:    u.Avatar.String,
 		Role:      u.Role.ToString(),
 		CreatedAt: timestamppb.New(*u.CreatedAt),
 		UpdatedAt: timestamppb.New(*u.UpdatedAt),
