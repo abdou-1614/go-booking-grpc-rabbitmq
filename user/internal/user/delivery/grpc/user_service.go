@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/opentracing/opentracing-go"
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserGRPCService struct {
@@ -25,6 +26,28 @@ func NewUserGRPCService(userUC user.UseCase, logger logger.Loggor, validate *val
 		logger:   logger,
 		validate: validate,
 	}
+}
+
+func (u *UserGRPCService) GetUserID(ctx context.Context, req *userService.GetByIDRequest) (*userService.GetByIDResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserGRPCService.CreateUser")
+
+	defer span.Finish()
+
+	userUUID, err := uuid.FromString(req.GetUserID())
+
+	if err != nil {
+		u.logger.Errorf("uuid.FromString: %v", err)
+		return nil, grpc_error.ErrorResponse(err, "uuid.FromString")
+	}
+
+	foundUser, err := u.userUC.GetByID(ctx, userUUID)
+
+	if err != nil {
+		u.logger.Errorf("userUC.GetByID : %v", err)
+		return nil, grpc_error.ErrorResponse(err, "userUC.GetByID")
+	}
+
+	return &userService.GetByIDResponse{User: foundUser.ToProto()}, nil
 }
 
 func (u *UserGRPCService) CreateUser(ctx context.Context, req *userService.CreateUserRequest) (*userService.CreateUserResponse, error) {
