@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 )
 
 type userPGRepository struct {
@@ -43,4 +44,26 @@ func (u *userPGRepository) Create(ctx context.Context, user *model.User) (*model
 	}
 
 	return &created, nil
+}
+
+func (u *userPGRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.GetByID")
+
+	defer span.Finish()
+
+	var res model.UserResponse
+
+	if err := u.db.QueryRow(ctx, getUserByIDQuery, id).Scan(
+		&res.ID,
+		&res.FirstName,
+		&res.LastName,
+		&res.Email,
+		&res.Role,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	); err != nil {
+		return nil, errors.Wrap(err, "userPGRepository.GetByID.Scan")
+	}
+
+	return &res, nil
 }
