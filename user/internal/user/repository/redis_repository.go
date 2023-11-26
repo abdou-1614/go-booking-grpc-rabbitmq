@@ -41,6 +41,26 @@ func (u *userRedisRepository) SaveUser(ctx context.Context, user *model.UserResp
 	return nil
 }
 
+func (u *userRedisRepository) GetUserID(ctx context.Context, id uuid.UUID) (*model.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userRedisRepository.GetUserID")
+
+	defer span.Finish()
+
+	result, err := u.redisConn.Get(ctx, u.createKey(id)).Bytes()
+
+	if err != nil {
+		return nil, errors.Wrap(err, "userRedisRepository.GetUserID.redisConn.Get")
+	}
+
+	var res model.UserResponse
+
+	if err := json.Unmarshal(result, &res); err != nil {
+		return nil, errors.Wrap(err, "userRedisRepository.GetUserID.json.Unmrshal")
+	}
+
+	return &res, nil
+}
+
 func (u *userRedisRepository) createKey(userID uuid.UUID) string {
 	return fmt.Sprintf("%s: %s", u.prefix, userID)
 }
