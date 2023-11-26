@@ -9,6 +9,7 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 )
 
 const (
@@ -47,4 +48,32 @@ func (u *userUseCase) Register(ctx context.Context, user *model.User) (*model.Us
 	}
 
 	return created, err
+}
+
+func (u *userUseCase) GetByID(ctx context.Context, id uuid.UUID) (*model.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.GetByID")
+
+	defer span.Finish()
+
+	cashedUser, err := u.redRepo.GetUserID(ctx, id)
+
+	if err != nil {
+		u.log.Errorf("redisRepo.GetUserID : %v", err)
+	}
+
+	if cashedUser != nil {
+		return cashedUser, nil
+	}
+
+	userResponse, err := u.userPGRepo.GetByID(ctx, id)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "userUseCase.userPGRepo.GetByID")
+	}
+
+	if err := u.redRepo.SaveUser(ctx, userResponse); err != nil {
+		u.log.Errorf("redisRepo.SaveUser: %v", err)
+	}
+
+	return userResponse, nil
 }
