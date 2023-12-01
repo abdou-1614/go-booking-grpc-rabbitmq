@@ -31,10 +31,10 @@ HttpServer:
   SessionCookieName: "session_token"
 
 postgres:
-  PostgresqlHost: roundhouse.proxy.rlwy.net
-  PostgresqlPort: 57236
+  PostgresqlHost: viaduct.proxy.rlwy.net
+  PostgresqlPort: 22852
   PostgresqlUser: postgres
-  PostgresqlPassword: B4C*3AE3B5FdE5c55Edc*13eb56GFDc1
+  PostgresqlPassword: E2e5E11dFDGGFGgCBDF5e4Dedbaf4da4
   PostgresqlDbname: railway
   PostgresqlSslmode: "disable"
   PgDriver: pgx
