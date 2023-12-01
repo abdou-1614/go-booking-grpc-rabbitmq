@@ -20,7 +20,7 @@ services:
     restart: always
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=B4C*3AE3B5FdE5c55Edc*13eb56GFDc1
+      - POSTGRES_PASSWORD=bBc26eC3ad525114E-Ef4d1a1fdGcAG6
       - POSTGRES_DB=railway
       - POSTGRES_HOST=roundhouse.proxy.rlwy.net
     command: -p 5433
