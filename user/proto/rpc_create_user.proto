@@ -25,3 +25,14 @@ message GetByIDResponse {
 message GetByIDRequest {
     string userID = 1;
 }
+
+
+message UploadAvatarReq {
+    string UserID = 1;
+    bytes Body = 2;
+    string ContentType = 3;
+}
+
+message UploadAvatarRes {
+    string UserID = 1
+}
