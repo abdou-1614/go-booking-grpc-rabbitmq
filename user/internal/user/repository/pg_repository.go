@@ -34,9 +34,11 @@ func (u *userPGRepository) Create(ctx context.Context, user *model.User) (*model
 		&user.LastName,
 		&user.Email,
 		&user.Password,
+		&user.Role,
 	).Scan(&created.ID, &created.FirstName,
 		&created.LastName,
 		&created.Email,
+		&created.Role,
 		&created.CreatedAt,
 		&created.UpdatedAt,
 	); err != nil {
