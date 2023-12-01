@@ -7,5 +7,7 @@ import "rpc_create_user.proto";
 option go_package = ".;userService";
 
 service UserService {
-    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {};
+    rpc GetUserByID (GetByIDRequest) returns (GetByIDResponse) {};
+    rpc UpdateAvatar(UploadAvatarReq) returns (UploadAvatarRes) {}
 }
