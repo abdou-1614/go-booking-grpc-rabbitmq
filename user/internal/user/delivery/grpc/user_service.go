@@ -28,7 +28,7 @@ func NewUserGRPCService(userUC user.UseCase, logger logger.Loggor, validate *val
 	}
 }
 
-func (u *UserGRPCService) GetUserID(ctx context.Context, req *userService.GetByIDRequest) (*userService.GetByIDResponse, error) {
+func (u *UserGRPCService) GetUserByID(ctx context.Context, req *userService.GetByIDRequest) (*userService.GetByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserGRPCService.CreateUser")
 
 	defer span.Finish()
@@ -60,6 +60,7 @@ func (u *UserGRPCService) CreateUser(ctx context.Context, req *userService.Creat
 		LastName:  req.GetLastName(),
 		Email:     req.GetEmail(),
 		Password:  req.GetPassword(),
+		Role:      (*model.Role)(&req.Role),
 	}
 
 	if err := u.validate.StructCtx(ctx, user); err != nil {
