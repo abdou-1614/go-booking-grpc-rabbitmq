@@ -4,12 +4,15 @@ import (
 	"Go-grpc/internal/model"
 	"Go-grpc/internal/user"
 	"Go-grpc/internal/user/delivery/rabbitmq"
+	"Go-grpc/pkg/http_error"
 	"Go-grpc/pkg/logger"
 	"context"
+	"encoding/json"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
+	"github.com/streadway/amqp"
 )
 
 const (
@@ -76,4 +79,63 @@ func (u *userUseCase) GetByID(ctx context.Context, id uuid.UUID) (*model.UserRes
 	}
 
 	return userResponse, nil
+}
+
+func (u *userUseCase) UpdateAvatar(ctx context.Context, data *model.UpdateAvatarMsg) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.UpdateAvatar")
+	defer span.Finish()
+
+	headers := make(amqp.Table, 1)
+	headers[userUUIDHeader] = data.UserID.String()
+
+	if err := u.amqp.Publish(
+		ctx,
+		imagesExchange,
+		resizeKey,
+		data.ContentType,
+		headers,
+		data.Body,
+	); err != nil {
+		return errors.Wrap(err, "UpdateUploadedAvatar.Publish")
+	}
+
+	u.log.Infof("UploadAvatar Publish -%v", headers)
+	return nil
+
+}
+
+func (u *userUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.UpdateUploadedAvatar")
+
+	defer span.Finish()
+
+	var img model.Image
+
+	if err := json.Unmarshal(delivery.Body, &img); err != nil {
+		return errors.Wrap(err, "")
+	}
+
+	userUUID, ok := delivery.Headers[userUUIDHeader].(string)
+
+	if !ok {
+		return errors.Wrap(http_error.InvalidUUID, "delivery.Headers")
+	}
+	uid, err := uuid.FromString(userUUID)
+
+	if err != nil {
+		return errors.Wrap(err, "uuid.FromString")
+	}
+	created, err := u.userPGRepo.UpdateAvatar(ctx, &model.UploadedImageMsg{
+		ImageID:    img.ImageID,
+		UserID:     uid,
+		ImageURL:   img.ImageURL,
+		IsUploaded: img.IsUploaded,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	u.log.Infof("UpdateUploadedAvatar", created.Avatar)
+	return nil
 }
