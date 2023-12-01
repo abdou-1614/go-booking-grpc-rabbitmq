@@ -6,6 +6,7 @@ import (
 	"time"
 
 	userService "Go-grpc/pb"
+	"Go-grpc/pkg/types"
 
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -13,14 +14,15 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID  `json:"id"`
-	FirstName string     `json:"first_name" validate:"required,min=3,max=25"`
-	LastName  string     `json:"last_name" validate:"required,min=3,max=25"`
-	Email     string     `json:"email" validate:"required,email"`
-	Role      *Role      `json:"role"`
-	Password  string     `json:"password" validate:"required,min=6,max=250"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	ID        uuid.UUID            `json:"id"`
+	FirstName string               `json:"first_name" validate:"required,min=3,max=25"`
+	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
+	Email     string               `json:"email" validate:"required,email"`
+	Role      *Role                `json:"role"`
+	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
+	Password  string               `json:"password" validate:"required,min=6,max=250"`
+	CreatedAt *time.Time           `json:"created_at"`
+	UpdatedAt *time.Time           `json:"updated_at"`
 }
 
 type CreateUserRequest struct {
@@ -32,13 +34,14 @@ type CreateUserRequest struct {
 }
 
 type UserResponse struct {
-	ID        uuid.UUID  `json:"id"`
-	FirstName string     `json:"first_name" validate:"required,min=3,max=25"`
-	LastName  string     `json:"last_name" validate:"required,min=3,max=25"`
-	Email     string     `json:"email" validate:"required,email"`
-	Role      *Role      `json:"role"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	ID        uuid.UUID            `json:"id"`
+	FirstName string               `json:"first_name" validate:"required,min=3,max=25"`
+	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
+	Email     string               `json:"email" validate:"required,email"`
+	Role      *Role                `json:"role"`
+	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
+	CreatedAt *time.Time           `json:"created_at"`
+	UpdatedAt *time.Time           `json:"updated_at"`
 }
 
 type Role string
@@ -70,6 +73,8 @@ type UserUpdate struct {
 	FirstName string    `json:"first_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
 	LastName  string    `json:"last_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
 	Email     string    `json:"email" validate:"omitempty,email" swaggertype:"string"`
+	Avatar    string    `json:"avatar" validate:"max=250" swaggertype:"string"`
+	Role      *Role     `json:"role"`
 }
 
 func (u *User) HashPassword() error {
