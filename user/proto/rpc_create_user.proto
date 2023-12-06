@@ -34,5 +34,5 @@ message UploadAvatarReq {
 }
 
 message UploadAvatarRes {
-    string UserID = 1
+    string UserID = 1;
 }
