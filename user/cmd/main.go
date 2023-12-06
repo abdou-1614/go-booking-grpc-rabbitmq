@@ -62,6 +62,6 @@ func main() {
 	appLogger.Infof("%-v", redisClient.PoolStats())
 
 	s := server.NewServer(appLogger, cfg, redisClient, pgxConn, tracer)
-
+	go s.RunGateway()
 	appLogger.Fatal(s.Run())
 }
