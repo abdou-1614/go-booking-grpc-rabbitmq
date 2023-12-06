@@ -2,11 +2,15 @@
 syntax = "proto3";
 
 option go_package = ".;userService";
-
+import "google/api/annotations.proto";
 package userService;
 
 service HelloService {
-  rpc SayHello(HelloRequest) returns (HelloResponse) {}
+  rpc SayHello(HelloRequest) returns (HelloResponse) {
+    option (google.api.http) = {
+      post: "/v1/hello"
+  };
+  }
 }
 
 message HelloRequest {
