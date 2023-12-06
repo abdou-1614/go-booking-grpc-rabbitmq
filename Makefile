@@ -21,4 +21,4 @@ listner:
 
 
 mg_user_db:
-	migrate -database postgresql://postgres:E2e5E11dFDGGFGgCBDF5e4Dedbaf4da4@viaduct.proxy.rlwy.net:22852/railway -path user/migrations up
+	migrate -database postgresql://postgres:5Bd4dedeBBggDD*21eBDEAfEBc-CcAeE@monorail.proxy.rlwy.net:42888/railway -path user/migrations up
