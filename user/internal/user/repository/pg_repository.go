@@ -3,6 +3,7 @@ package repository
 import (
 	"Go-grpc/internal/model"
 	"context"
+	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
@@ -65,6 +66,27 @@ func (u *userPGRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Us
 		&res.UpdatedAt,
 	); err != nil {
 		return nil, errors.Wrap(err, "userPGRepository.GetByID.Scan")
+	}
+
+	return &res, nil
+}
+
+func (u *userPGRepository) UpdateAvatar(ctx context.Context, msg model.UploadedImageMsg) (*model.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.UpdateUploadedAvatar")
+	defer span.Finish()
+
+	log.Printf("REPO  IMAGE: %v", msg)
+	var res model.UserResponse
+	if err := u.db.QueryRow(ctx, updateAvatarQuery, &msg.ImageURL, &msg.UserID).Scan(
+		&res.ID,
+		&res.FirstName,
+		&res.LastName,
+		&res.Email,
+		&res.Role,
+		&res.UpdatedAt,
+		&res.CreatedAt,
+	); err != nil {
+		return nil, errors.Wrap(err, "Scan")
 	}
 
 	return &res, nil
