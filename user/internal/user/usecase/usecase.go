@@ -125,7 +125,7 @@ func (u *userUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 	if err != nil {
 		return errors.Wrap(err, "uuid.FromString")
 	}
-	created, err := u.userPGRepo.UpdateAvatar(ctx, &model.UploadedImageMsg{
+	created, err := u.userPGRepo.UpdateAvatar(ctx, model.UploadedImageMsg{
 		ImageID:    img.ImageID,
 		UserID:     uid,
 		ImageURL:   img.ImageURL,
@@ -136,6 +136,6 @@ func (u *userUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 		return err
 	}
 
-	u.log.Infof("UpdateUploadedAvatar", created.Avatar)
+	u.log.Infof("UpdateUploadedAvatar", created.ID)
 	return nil
 }
