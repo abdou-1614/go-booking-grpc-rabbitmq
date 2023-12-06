@@ -11,6 +11,7 @@ import (
 	"Go-grpc/pkg/logger"
 	"context"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -20,6 +21,7 @@ import (
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
@@ -27,6 +29,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const (
@@ -49,6 +52,7 @@ func (s *HelloService) SayHello(ctx context.Context, in *userGRPCService.HelloRe
 }
 
 type Server struct {
+	userGRPCService.UnimplementedUserServiceServer
 	logger    logger.Loggor
 	cfg       *config.Config
 	redisConn *redis.Client
@@ -57,13 +61,15 @@ type Server struct {
 }
 
 func NewServer(logger logger.Loggor, cfg *config.Config, redisConn *redis.Client, pgxPool *pgxpool.Pool, tracer opentracing.Tracer) *Server {
-	return &Server{
+	server := &Server{
 		logger:    logger,
 		cfg:       cfg,
 		redisConn: redisConn,
 		pgxPool:   pgxPool,
 		tracer:    tracer,
 	}
+
+	return server
 }
 
 func (s *Server) Run() error {
@@ -151,6 +157,89 @@ func (s *Server) Run() error {
 	s.logger.Info("Server Exited Properly")
 
 	server.GracefulStop()
+
+	s.logger.Info("Server Exited Properly")
+
+	return nil
+}
+
+func (s *Server) RunGateway() error {
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+	validate := validator.New()
+
+	userPublisher, err := rabbitmq.NewUserPublisher(s.cfg, s.logger)
+
+	if err != nil {
+		return errors.Wrap(err, "rabbitmq.NewUserPubliser")
+	}
+
+	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
+	userRedisRepository := repository.NewUserRedisRepository(s.redisConn, userCachePrefix, userCacheDuration)
+	userUseCase := usecase.NewUserUseCase(userPGRepository, s.logger, userRedisRepository, userPublisher)
+
+	userConsumer := rabbitmq.NewUserConsumer(s.cfg, s.logger, userUseCase)
+
+	if err := userConsumer.Dial(); err != nil {
+		return errors.Wrap(err, "userConsumer.Dial")
+	}
+
+	avatarChan, err := userConsumer.CreateExchangeAndQueue(rabbitmq.UserExchange, rabbitmq.AvatarQueueName, rabbitmq.AvatarsBindingKey)
+
+	if err != nil {
+		return errors.Wrap(err, "userConsumer.CreateExchangeAndQueue")
+	}
+
+	defer avatarChan.Close()
+
+	userConsumer.RunConsumers(ctx, cancel)
+
+	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames: true,
+		},
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	})
+	grpcMux := runtime.NewServeMux(jsonOption)
+
+	userService := userGRPC.NewUserGRPCService(userUseCase, s.logger, validate)
+
+	err = userGRPCService.RegisterUserServiceHandlerServer(ctx, grpcMux, userService)
+	if err != nil {
+		s.logger.Errorf("cannot register handler server : %v", err)
+	}
+
+	mux := http.NewServeMux()
+
+	mux.Handle("/", grpcMux)
+
+	l, err := net.Listen("tcp", s.cfg.HttpServer.Port)
+
+	if err != nil {
+		return err
+	}
+
+	defer l.Close()
+
+	go func() {
+		s.logger.Infof("Http Server is listening on port: %v", s.cfg.HttpServer.Port)
+		s.logger.Fatal(http.Serve(l, mux))
+	}()
+
+	quite := make(chan os.Signal, 1)
+
+	signal.Notify(quite, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case v := <-quite:
+		s.logger.Errorf("signal.Notify: %v", v)
+	case done := <-ctx.Done():
+		s.logger.Errorf("ctx.Done: %v", done)
+	}
 
 	s.logger.Info("Server Exited Properly")
 
