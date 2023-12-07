@@ -240,6 +240,100 @@ func (x *GetByIDRequest) GetUserID() string {
 	return ""
 }
 
+type GetByEmailRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (x *GetByEmailRequest) Reset() {
+	*x = GetByEmailRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_rpc_create_user_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetByEmailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByEmailRequest) ProtoMessage() {}
+
+func (x *GetByEmailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_create_user_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByEmailRequest.ProtoReflect.Descriptor instead.
+func (*GetByEmailRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_create_user_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetByEmailRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type GetByEmailResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	User *User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+}
+
+func (x *GetByEmailResponse) Reset() {
+	*x = GetByEmailResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_rpc_create_user_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetByEmailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByEmailResponse) ProtoMessage() {}
+
+func (x *GetByEmailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_create_user_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByEmailResponse.ProtoReflect.Descriptor instead.
+func (*GetByEmailResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_create_user_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetByEmailResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
 type UploadAvatarReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -253,7 +347,7 @@ type UploadAvatarReq struct {
 func (x *UploadAvatarReq) Reset() {
 	*x = UploadAvatarReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_create_user_proto_msgTypes[4]
+		mi := &file_rpc_create_user_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -266,7 +360,7 @@ func (x *UploadAvatarReq) String() string {
 func (*UploadAvatarReq) ProtoMessage() {}
 
 func (x *UploadAvatarReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_create_user_proto_msgTypes[4]
+	mi := &file_rpc_create_user_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -279,7 +373,7 @@ func (x *UploadAvatarReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadAvatarReq.ProtoReflect.Descriptor instead.
 func (*UploadAvatarReq) Descriptor() ([]byte, []int) {
-	return file_rpc_create_user_proto_rawDescGZIP(), []int{4}
+	return file_rpc_create_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UploadAvatarReq) GetUserID() string {
@@ -314,7 +408,7 @@ type UploadAvatarRes struct {
 func (x *UploadAvatarRes) Reset() {
 	*x = UploadAvatarRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_create_user_proto_msgTypes[5]
+		mi := &file_rpc_create_user_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -327,7 +421,7 @@ func (x *UploadAvatarRes) String() string {
 func (*UploadAvatarRes) ProtoMessage() {}
 
 func (x *UploadAvatarRes) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_create_user_proto_msgTypes[5]
+	mi := &file_rpc_create_user_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -340,7 +434,7 @@ func (x *UploadAvatarRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadAvatarRes.ProtoReflect.Descriptor instead.
 func (*UploadAvatarRes) Descriptor() ([]byte, []int) {
-	return file_rpc_create_user_proto_rawDescGZIP(), []int{5}
+	return file_rpc_create_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UploadAvatarRes) GetUserID() string {
@@ -375,17 +469,24 @@ var file_rpc_create_user_proto_rawDesc = []byte{
 	0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x22, 0x28, 0x0a,
 	0x0e, 0x47, 0x65, 0x74, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x5f, 0x0a, 0x0f, 0x55, 0x70, 0x6c, 0x6f, 0x61,
-	0x64, 0x41, 0x76, 0x61, 0x74, 0x61, 0x72, 0x52, 0x65, 0x71, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73,
-	0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72,
-	0x49, 0x44, 0x12, 0x12, 0x0a, 0x04, 0x42, 0x6f, 0x64, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c,
-	0x52, 0x04, 0x42, 0x6f, 0x64, 0x79, 0x12, 0x20, 0x0a, 0x0b, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
-	0x74, 0x54, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x43, 0x6f, 0x6e,
-	0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x22, 0x29, 0x0a, 0x0f, 0x55, 0x70, 0x6c, 0x6f,
-	0x61, 0x64, 0x41, 0x76, 0x61, 0x74, 0x61, 0x72, 0x52, 0x65, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x55,
-	0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65,
-	0x72, 0x49, 0x44, 0x42, 0x0f, 0x5a, 0x0d, 0x2e, 0x3b, 0x75, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x29, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x42, 0x79,
+	0x45, 0x6d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05,
+	0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61,
+	0x69, 0x6c, 0x22, 0x3b, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x42, 0x79, 0x45, 0x6d, 0x61, 0x69, 0x6c,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x22,
+	0x5f, 0x0a, 0x0f, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x41, 0x76, 0x61, 0x74, 0x61, 0x72, 0x52,
+	0x65, 0x71, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x12, 0x12, 0x0a, 0x04, 0x42, 0x6f,
+	0x64, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x42, 0x6f, 0x64, 0x79, 0x12, 0x20,
+	0x0a, 0x0b, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0b, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65,
+	0x22, 0x29, 0x0a, 0x0f, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x41, 0x76, 0x61, 0x74, 0x61, 0x72,
+	0x52, 0x65, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x42, 0x0f, 0x5a, 0x0d, 0x2e,
+	0x3b, 0x75, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -400,24 +501,27 @@ func file_rpc_create_user_proto_rawDescGZIP() []byte {
 	return file_rpc_create_user_proto_rawDescData
 }
 
-var file_rpc_create_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_rpc_create_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_rpc_create_user_proto_goTypes = []interface{}{
 	(*CreateUserRequest)(nil),  // 0: userService.CreateUserRequest
 	(*CreateUserResponse)(nil), // 1: userService.CreateUserResponse
 	(*GetByIDResponse)(nil),    // 2: userService.GetByIDResponse
 	(*GetByIDRequest)(nil),     // 3: userService.GetByIDRequest
-	(*UploadAvatarReq)(nil),    // 4: userService.UploadAvatarReq
-	(*UploadAvatarRes)(nil),    // 5: userService.UploadAvatarRes
-	(*User)(nil),               // 6: userService.User
+	(*GetByEmailRequest)(nil),  // 4: userService.GetByEmailRequest
+	(*GetByEmailResponse)(nil), // 5: userService.GetByEmailResponse
+	(*UploadAvatarReq)(nil),    // 6: userService.UploadAvatarReq
+	(*UploadAvatarRes)(nil),    // 7: userService.UploadAvatarRes
+	(*User)(nil),               // 8: userService.User
 }
 var file_rpc_create_user_proto_depIdxs = []int32{
-	6, // 0: userService.CreateUserResponse.user:type_name -> userService.User
-	6, // 1: userService.GetByIDResponse.user:type_name -> userService.User
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	8, // 0: userService.CreateUserResponse.user:type_name -> userService.User
+	8, // 1: userService.GetByIDResponse.user:type_name -> userService.User
+	8, // 2: userService.GetByEmailResponse.user:type_name -> userService.User
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_rpc_create_user_proto_init() }
@@ -476,7 +580,7 @@ func file_rpc_create_user_proto_init() {
 			}
 		}
 		file_rpc_create_user_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UploadAvatarReq); i {
+			switch v := v.(*GetByEmailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -488,6 +592,30 @@ func file_rpc_create_user_proto_init() {
 			}
 		}
 		file_rpc_create_user_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetByEmailResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_rpc_create_user_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadAvatarReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_rpc_create_user_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UploadAvatarRes); i {
 			case 0:
 				return &v.state
@@ -506,7 +634,7 @@ func file_rpc_create_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_rpc_create_user_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
