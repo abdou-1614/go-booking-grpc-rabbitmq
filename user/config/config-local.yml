@@ -32,9 +32,9 @@ HttpServer:
 
 postgres:
   PostgresqlHost: monorail.proxy.rlwy.net
-  PostgresqlPort: 42888
+  PostgresqlPort: 58785
   PostgresqlUser: postgres
-  PostgresqlPassword: 5Bd4dedeBBggDD*21eBDEAfEBc-CcAeE
+  PostgresqlPassword: -5aaC14F51DbgCg*ad6e-dC*532*5c*d
   PostgresqlDbname: railway
   PostgresqlSslmode: "disable"
   PgDriver: pgx
