@@ -29,7 +29,7 @@ func NewUserGRPCService(userUC user.UseCase, logger logger.Loggor, validate *val
 }
 
 func (u *UserGRPCService) GetUserByID(ctx context.Context, req *userService.GetByIDRequest) (*userService.GetByIDResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserGRPCService.CreateUser")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserGRPCService.GetUserByID")
 
 	defer span.Finish()
 
@@ -48,6 +48,21 @@ func (u *UserGRPCService) GetUserByID(ctx context.Context, req *userService.GetB
 	}
 
 	return &userService.GetByIDResponse{User: foundUser.ToProto()}, nil
+}
+
+func (u *UserGRPCService) GetUserEmail(ctx context.Context, req *userService.GetByEmailRequest) (*userService.GetByEmailResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserGRPCService.GetUserEmail")
+
+	defer span.Finish()
+
+	foundUser, err := u.userUC.GetByEmail(ctx, req.GetEmail())
+
+	if err != nil {
+		u.logger.Errorf("userUC.GetByID : %v", err)
+		return nil, grpc_error.ErrorResponse(err, "userUC.GetByID")
+	}
+
+	return &userService.GetByEmailResponse{User: foundUser.ToProto()}, nil
 }
 
 func (u *UserGRPCService) CreateUser(ctx context.Context, req *userService.CreateUserRequest) (*userService.CreateUserResponse, error) {
