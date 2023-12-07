@@ -20,4 +20,10 @@ service UserService {
         };
     }
     rpc UpdateAvatar(UploadAvatarReq) returns (UploadAvatarRes) {}
+
+    rpc GetUserEmail (GetByEmailRequest) returns (GetByEmailResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_email"
+        };
+    }
 }
