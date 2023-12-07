@@ -8,6 +8,7 @@ import (
 	"Go-grpc/pkg/logger"
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
@@ -51,6 +52,22 @@ func (u *userUseCase) Register(ctx context.Context, user *model.User) (*model.Us
 	}
 
 	return created, err
+}
+
+func (u *userUseCase) GetByEmail(ctx context.Context, email string) (*model.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.GetByEmail")
+
+	defer span.Finish()
+
+	email = strings.ToLower(strings.TrimSpace(email))
+
+	userResponse, err := u.userPGRepo.GetByEmail(ctx, email)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "userUseCase.userPGRepo.GetByEmail")
+	}
+
+	return userResponse, nil
 }
 
 func (u *userUseCase) GetByID(ctx context.Context, id uuid.UUID) (*model.UserResponse, error) {
