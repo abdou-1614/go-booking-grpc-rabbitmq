@@ -13,4 +13,5 @@ type UseCase interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.UserResponse, error)
 	UpdateUploadedAvatar(ctx context.Context, delevery amqp.Delivery) error
 	UpdateAvatar(ctx context.Context, data *model.UpdateAvatarMsg) error
+	GetByEmail(ctx context.Context, email string) (*model.UserResponse, error)
 }
