@@ -71,6 +71,27 @@ func (u *userPGRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Us
 	return &res, nil
 }
 
+func (u *userPGRepository) GetByEmail(ctx context.Context, email string) (*model.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.GetByEmail")
+	defer span.Finish()
+
+	var res model.UserResponse
+
+	if err := u.db.QueryRow(ctx, getUserByEmail, email).Scan(
+		&res.ID,
+		&res.FirstName,
+		&res.LastName,
+		&res.Email,
+		&res.Role,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	); err != nil {
+		return nil, errors.Wrap(err, "Scan")
+	}
+
+	return &res, nil
+}
+
 func (u *userPGRepository) UpdateAvatar(ctx context.Context, msg model.UploadedImageMsg) (*model.UserResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.UpdateUploadedAvatar")
 	defer span.Finish()
