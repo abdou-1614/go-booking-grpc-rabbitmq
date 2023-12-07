@@ -26,6 +26,14 @@ message GetByIDRequest {
     string userID = 1;
 }
 
+message GetByEmailRequest {
+    string email = 1;
+}
+
+message GetByEmailResponse {
+    User user = 1;
+}
+
 
 message UploadAvatarReq {
     string UserID = 1;
