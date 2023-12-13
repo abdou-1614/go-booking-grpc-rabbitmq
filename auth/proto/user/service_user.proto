@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package userService;
+
+import "rpc_create_user.proto";
+
+option go_package = ".;userService";
+import "google/api/annotations.proto";
+
+service UserService {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_user"
+            body: "*"
+        };
+    }
+    rpc GetUserByID (GetByIDRequest) returns (GetByIDResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_user"
+        };
+    }
+    rpc UpdateAvatar(UploadAvatarReq) returns (UploadAvatarRes) {}
+
+    rpc GetUserEmail (GetByEmailRequest) returns (GetByEmailResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_email"
+        };
+    }
+}
