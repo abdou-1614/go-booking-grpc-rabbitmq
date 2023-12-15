@@ -28,6 +28,14 @@ type SessionResponse struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+type LoginResponse struct {
+	SessionID             string    `json:"session_id"`
+	AccessToken           string    `json:"access_token"`
+	RefreshToken          string    `json:"refresh_token"`
+	AccessTokenExpiresAt  time.Time `json:"access_expires_at"`
+	RefreshTokenExpiresAt time.Time `json:"refresh_expires_at"`
+}
+
 type CreateSessionParams struct {
 	ID           uuid.UUID `json:"id"`
 	Email        string    `json:"email"`
