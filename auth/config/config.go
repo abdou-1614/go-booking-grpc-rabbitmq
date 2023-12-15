@@ -35,7 +35,8 @@ type GRPCServer struct {
 	CookieLifeTime      int
 	CsrfExpire          int
 	Session             string
-	SessionExpire       int
+	AccessTokenExpire   int
+	RefreshTokenExpire  int
 	Mode                string
 	SessionPrefix       string
 	CSRFPrefix          string
@@ -45,6 +46,7 @@ type GRPCServer struct {
 	MaxConnectionIdle   time.Duration
 	MaxConnectionAge    time.Duration
 	UserGrpcServicePort string
+	TokenSymmetricKey   string
 }
 
 // RabbitMQ
