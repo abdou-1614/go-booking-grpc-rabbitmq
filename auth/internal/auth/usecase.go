@@ -6,5 +6,5 @@ import (
 )
 
 type SessUseCase interface {
-	Login(ctx context.Context, arg *model.CreateSessionParams) (*model.SessionResponse, error)
+	CreateSession(ctx context.Context, email string, password string) (*model.LoginResponse, error)
 }
