@@ -3,7 +3,8 @@ GRPCServer:
   Port: ":5051"
   CookieLifeTime: 360
   CsrfExpire: 15
-  SessionExpire: 60
+  AccessTokenExpire: 60
+  RefreshTokenExpire: 15
   SessionID: "SessionID"
   Mode: "Development"
   Timeout: 15
@@ -14,6 +15,7 @@ GRPCServer:
   SessionPrefix: "session"
   CSRFPrefix: "csrf"
   UserGrpcServicePort: ":5000"
+  TokenSymmetricKey: "@@dd@@"
 
 Rabbitmq:
   Host: localhost
