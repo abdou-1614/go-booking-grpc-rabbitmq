@@ -13,6 +13,7 @@ message User {
     string LastName = 3;
     string Email = 4;
     string Role = 5;
+    string Password = 6;
     google.protobuf.Timestamp CreatedAt = 6;
     google.protobuf.Timestamp UpdatedAt = 7;
 }
