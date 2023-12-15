@@ -2,9 +2,11 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-package userService;
+package authService;
 
-option go_package = ".;userService";
+option go_package = ".;authervice";
+import "google/api/annotations.proto";
+
 
 message LoginUserRequest {
     string email = 1;
@@ -12,9 +14,18 @@ message LoginUserRequest {
 }
 
 message LoginUserResponse {
-    string session_id = 2;
-    string access_token = 3;
-    string refresh_token = 4;
-    google.protobuf.Timestamp access_token_expires_at = 5;
-    google.protobuf.Timestamp refresh_token_expires_at = 6;
+    string session_id = 1;
+    string access_token = 2;
+    string refresh_token = 3;
+    google.protobuf.Timestamp access_token_expires_at = 4;
+    google.protobuf.Timestamp refresh_token_expires_at = 5;
+}
+
+service AuthService {
+    rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/login_user"
+            body: "*"
+        };
+    }
 }
