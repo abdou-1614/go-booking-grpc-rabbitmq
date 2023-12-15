@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	Login(ctx context.Context, arg *model.CreateSessionParams) (*model.SessionResponse, error)
+	CreateSession(ctx context.Context, arg *model.CreateSessionParams) (*model.SessionResponse, error)
 }
