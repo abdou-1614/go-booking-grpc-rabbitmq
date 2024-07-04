@@ -1,32 +1,9 @@
 version: "3.8"
 
 services:
-  user_microservice:
-    container_name: user_microservice
-    build:
-      context: ./user
-      dockerfile: Dockerfile
-    ports:
-      - "5001:5001"
-      - "7071:7071"
-    environment:
-      - PORT=5001
-      - CONFIG=docker
-      - CFG_PATH=config/config-docker.yml
-    depends_on:
-      - redis
-      - prometheus
-      - node_exporter
-      - grafana
-    restart: always
-    volumes:
-      - ./user:/app
-    networks:
-      - hotels_network
-
   redis:
     image: redis:6-alpine
-    container_name: booking_redis
+    container_name: user_redis
     ports:
       - "6379:6379"
     restart: always
@@ -37,43 +14,18 @@ services:
     image: kartoza/postgis:13.0
     container_name: user_postgesql
     expose:
-      - "5433"
+      - "16319"
     ports:
-      - "5433:5432"
+      - "16319:16319"
     restart: always
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=user_db
-      - POSTGRES_HOST=5433
+      - POSTGRES_PASSWORD=lbYaBEHUhPqpjBJuCticbPmuMFdxvQBb
+      - POSTGRES_DB=railway
+      - POSTGRES_HOST=viaduct.proxy.rlwy.net
     command: -p 5433
     volumes:
       - ./user_pgdata:/var/lib/postgresql/data
-    networks:
-      - hotels_network
-      
-  prometheus:
-    container_name: prometheus_container
-    image: prom/prometheus
-    volumes:
-      - ./docker/monitoring/prometheus-local.yml:/etc/prometheus/prometheus.yml:Z
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention=20d'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - '9090:9090'
-    networks:
-      - hotels_network
-
-
-  node_exporter:
-    container_name: node_exporter_container
-    image: prom/node-exporter
-    ports:
-      - '9101:9100'
     networks:
       - hotels_network
 
@@ -100,21 +52,40 @@ services:
       - 14250:14250
       - 9411:9411
 
-  rabbitmq:
-    image: 'rabbitmq:3.8-management-alpine'
+  zookeeper:
+    restart: always
+    container_name: kafka-go-zookeeper
+    image: confluentinc/cp-zookeeper:7.3.0
     ports:
-      # The standard AMQP protocol port
-      - '5672:5672'
-      # HTTP management UI
-      - '15672:15672'
-
-
-
-#
-#volumes:
-#  main_pgdata:
-#  user_pgdata:
-#  prometheus-data:
+      - "2181:2181"
+    volumes:
+      - "zookeeper-volume:/bitnami"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    restart: always
+    container_name: kafka-go
+    image: confluentinc/cp-kafka:7.3.0
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka-volume:/bitnami"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:29092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+volumes:
+  kafka-volume:
+  zookeeper-volume:
+  main_pgdata:
+  user_pgdata:
+  prometheus-data:
 
 networks:
   hotels_network:

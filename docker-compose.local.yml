@@ -14,37 +14,20 @@ services:
     image: kartoza/postgis:13.0
     container_name: user_postgesql
     expose:
-      - "5433"
+      - "16319"
     ports:
-      - "5433:5432"
+      - "16319:16319"
     restart: always
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=bBc26eC3ad525114E-Ef4d1a1fdGcAG6
+      - POSTGRES_PASSWORD=lbYaBEHUhPqpjBJuCticbPmuMFdxvQBb
       - POSTGRES_DB=railway
-      - POSTGRES_HOST=roundhouse.proxy.rlwy.net
+      - POSTGRES_HOST=viaduct.proxy.rlwy.net
     command: -p 5433
     volumes:
       - ./user_pgdata:/var/lib/postgresql/data
     networks:
       - hotels_network
-
-  prometheus:
-    container_name: prometheus_container
-    image: prom/prometheus
-    volumes:
-      - ./docker/monitoring/prometheus-local.yml:/etc/prometheus/prometheus.yml:Z
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention=20d'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - '9090:9090'
-    networks:
-      - hotels_network
-
 
   node_exporter:
     container_name: node_exporter_container
@@ -77,19 +60,22 @@ services:
       - 14250:14250
       - 9411:9411
 
-  rabbitmq:
-    image: 'rabbitmq:3.8-management-alpine'
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.0
+    container_name: kafka
     ports:
-      # The standard AMQP protocol port
-      - '5672:5672'
-      # HTTP management UI
-      - '15672:15672'
-
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
 volumes:
   main_pgdata:
   user_pgdata:
-  prometheus-data:
+  #prometheus-data:
 
 networks:
   hotels_network:
