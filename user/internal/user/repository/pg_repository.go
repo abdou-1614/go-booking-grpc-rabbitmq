@@ -35,11 +35,9 @@ func (u *userPGRepository) Create(ctx context.Context, user *model.User) (*model
 		&user.LastName,
 		&user.Email,
 		&user.Password,
-		&user.Role,
 	).Scan(&created.ID, &created.FirstName,
 		&created.LastName,
 		&created.Email,
-		&created.Role,
 		&created.CreatedAt,
 		&created.UpdatedAt,
 	); err != nil {
@@ -61,7 +59,6 @@ func (u *userPGRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Us
 		&res.FirstName,
 		&res.LastName,
 		&res.Email,
-		&res.Role,
 		&res.CreatedAt,
 		&res.UpdatedAt,
 	); err != nil {
@@ -82,7 +79,6 @@ func (u *userPGRepository) GetByEmail(ctx context.Context, email string) (*model
 		&res.FirstName,
 		&res.LastName,
 		&res.Email,
-		&res.Role,
 		&res.CreatedAt,
 		&res.UpdatedAt,
 	); err != nil {
@@ -103,7 +99,6 @@ func (u *userPGRepository) UpdateAvatar(ctx context.Context, msg model.UploadedI
 		&res.FirstName,
 		&res.LastName,
 		&res.Email,
-		&res.Role,
 		&res.UpdatedAt,
 		&res.CreatedAt,
 	); err != nil {

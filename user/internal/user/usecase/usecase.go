@@ -3,7 +3,6 @@ package usecase
 import (
 	"Go-grpc/internal/model"
 	"Go-grpc/internal/user"
-	"Go-grpc/internal/user/delivery/rabbitmq"
 	"Go-grpc/pkg/http_error"
 	"Go-grpc/pkg/logger"
 	"context"
@@ -26,15 +25,13 @@ type userUseCase struct {
 	userPGRepo user.PGRepository
 	log        logger.Loggor
 	redRepo    user.RedisRepository
-	amqp       rabbitmq.Publisher
 }
 
-func NewUserUseCase(userPGRepo user.PGRepository, log logger.Loggor, redRepo user.RedisRepository, amqp rabbitmq.Publisher) *userUseCase {
+func NewUserUseCase(userPGRepo user.PGRepository, log logger.Loggor, redRepo user.RedisRepository) *userUseCase {
 	return &userUseCase{
 		userPGRepo: userPGRepo,
 		log:        log,
 		redRepo:    redRepo,
-		amqp:       amqp,
 	}
 }
 
@@ -104,17 +101,6 @@ func (u *userUseCase) UpdateAvatar(ctx context.Context, data *model.UpdateAvatar
 
 	headers := make(amqp.Table, 1)
 	headers[userUUIDHeader] = data.UserID.String()
-
-	if err := u.amqp.Publish(
-		ctx,
-		imagesExchange,
-		resizeKey,
-		data.ContentType,
-		headers,
-		data.Body,
-	); err != nil {
-		return errors.Wrap(err, "UpdateUploadedAvatar.Publish")
-	}
 
 	u.log.Infof("UploadAvatar Publish -%v", headers)
 	return nil
