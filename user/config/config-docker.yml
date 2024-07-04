@@ -15,11 +15,10 @@ GRPCServer:
   CSRFPrefix: "csrf"
   SessionGrpcServicePort: ":5000"
 
-Rabbitmq:
-  Host: localhost
-  Port: 5672
-  User: guest
-  Password: guest
+Kafka:
+#  Brokers: ["kafka1:9093", "kafka2:9093", "kafka3:9093"]
+  Brokers: ["localhost:9092", "localhost:9092", "localhost:9092"]
+#  Brokers: ["host.docker.internal:9093", "host.docker.internal:9093", "host.docker.internal:9093"]
 
 HttpServer:
   Port: ":8007"
@@ -31,10 +30,10 @@ HttpServer:
   SessionCookieName: "session_token"
 
 postgres:
-  PostgresqlHost: monorail.proxy.rlwy.net
-  PostgresqlPort: 58785
+  PostgresqlHost: roundhouse.proxy.rlwy.net
+  PostgresqlPort: 16694
   PostgresqlUser: postgres
-  PostgresqlPassword: -5aaC14F51DbgCg*ad6e-dC*532*5c*d
+  PostgresqlPassword: pPESuijUNwgwcRnXUwGVnRlahvLTiean
   PostgresqlDbname: railway
   PostgresqlSslmode: "disable"
   PgDriver: pgx

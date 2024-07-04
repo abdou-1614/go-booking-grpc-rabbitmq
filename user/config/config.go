@@ -10,12 +10,12 @@ import (
 type Config struct {
 	GRPCServer GRPCServer
 	HttpServer HttpServer
+	Kafka      Kafka
 	Postgres   PostgresConfig
 	Redis      RedisConfig
 	Metrics    Metrics
 	Logger     Logger
 	Jaeger     Jaeger
-	RabbitMQ   RabbitMQ
 }
 
 type HttpServer struct {
@@ -45,14 +45,6 @@ type GRPCServer struct {
 	MaxConnectionIdle      time.Duration
 	MaxConnectionAge       time.Duration
 	SessionGrpcServicePort string
-}
-
-// RabbitMQ
-type RabbitMQ struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
 }
 
 // Logger config
@@ -100,6 +92,10 @@ type Jaeger struct {
 	Host        string
 	ServiceName string
 	LogSpans    bool
+}
+
+type Kafka struct {
+	Brokers []string
 }
 
 func LoadConfig(fileName string) (*viper.Viper, error) {
