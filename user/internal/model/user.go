@@ -17,7 +17,6 @@ type User struct {
 	FirstName string     `json:"first_name" validate:"required,min=3,max=25"`
 	LastName  string     `json:"last_name" validate:"required,min=3,max=25"`
 	Email     string     `json:"email" validate:"required,email"`
-	Role      *Role      `json:"role"`
 	Password  string     `json:"password" validate:"required,min=6,max=250"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
@@ -28,7 +27,6 @@ type CreateUserRequest struct {
 	LastName  string `json:"last_name" validate:"required,min=3,max=25"`
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=6,max=250"`
-	Role      *Role  `json:"role"`
 }
 
 type UserResponse struct {
@@ -36,7 +34,6 @@ type UserResponse struct {
 	FirstName string     `json:"first_name" validate:"required,min=3,max=25"`
 	LastName  string     `json:"last_name" validate:"required,min=3,max=25"`
 	Email     string     `json:"email" validate:"required,email"`
-	Role      *Role      `json:"role"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 }
@@ -70,7 +67,6 @@ type UserUpdate struct {
 	FirstName string    `json:"first_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
 	LastName  string    `json:"last_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
 	Email     string    `json:"email" validate:"omitempty,email" swaggertype:"string"`
-	Role      *Role     `json:"role"`
 }
 
 func (u *User) HashPassword() error {
@@ -110,8 +106,15 @@ func (u *UserResponse) ToProto() *userService.User {
 		FirstName: u.FirstName,
 		LastName:  u.LastName,
 		Email:     u.Email,
-		Role:      u.Role.ToString(),
 		CreatedAt: timestamppb.New(*u.CreatedAt),
 		UpdatedAt: timestamppb.New(*u.UpdatedAt),
 	}
+}
+
+type ErrorMessage struct {
+	Offset    int64     `json:"offset"`
+	Error     string    `json:"error"`
+	Time      time.Time `json:"time"`
+	Partition int32     `json:"partition"`
+	Topic     string    `json:"topic"`
 }

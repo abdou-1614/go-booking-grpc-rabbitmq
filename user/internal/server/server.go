@@ -4,7 +4,7 @@ import (
 	"Go-grpc/config"
 	"Go-grpc/internal/interceptor"
 	userGRPC "Go-grpc/internal/user/delivery/grpc"
-	"Go-grpc/internal/user/delivery/rabbitmq"
+	"Go-grpc/internal/user/delivery/kafka"
 	"Go-grpc/internal/user/repository"
 	"Go-grpc/internal/user/usecase"
 	userGRPCService "Go-grpc/pb"
@@ -24,7 +24,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
-	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -38,6 +37,7 @@ const (
 	maxHeaderBytes    = 1 << 20
 	userCachePrefix   = "users:"
 	userCacheDuration = time.Minute * 15
+	kafkaGroupID      = "user_group"
 )
 
 type HelloService struct {
@@ -73,54 +73,39 @@ func NewServer(logger logger.Loggor, cfg *config.Config, redisConn *redis.Client
 }
 
 func (s *Server) Run() error {
-
 	ctx, cancel := context.WithCancel(context.Background())
-
 	defer cancel()
 
 	im := interceptor.NewInterceptorManger(s.cfg, s.tracer, s.logger)
 	validate := validator.New()
 
-	userPublisher, err := rabbitmq.NewUserPublisher(s.cfg, s.logger)
-
-	if err != nil {
-		return errors.Wrap(err, "rabbitmq.NewUserPubliser")
-	}
-
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userRedisRepository := repository.NewUserRedisRepository(s.redisConn, userCachePrefix, userCacheDuration)
-	userUseCase := usecase.NewUserUseCase(userPGRepository, s.logger, userRedisRepository, userPublisher)
+	userUseCase := usecase.NewUserUseCase(userPGRepository, s.logger, userRedisRepository)
 
-	userConsumer := rabbitmq.NewUserConsumer(s.cfg, s.logger, userUseCase)
+	// Initialize Kafka producer
+	kafkaProducer := kafka.NewUserProducer(s.logger, s.cfg)
+	kafkaProducer.Run()
+	defer kafkaProducer.Close()
 
-	if err := userConsumer.Dial(); err != nil {
-		return errors.Wrap(err, "userConsumer.Dial")
-	}
+	// Initialize Kafka consumer
+	userConsumerGroup := kafka.NewUserConsumerGroup(s.cfg.Kafka.Brokers, kafkaGroupID, s.cfg, s.logger, userUseCase, validate)
+	go userConsumerGroup.CreateUserConsumer(ctx, cancel, kafkaGroupID, kafka.CreateUserTopic, kafka.CreateUsertWorkers)
 
-	avatarChan, err := userConsumer.CreateExchangeAndQueue(rabbitmq.UserExchange, rabbitmq.AvatarQueueName, rabbitmq.AvatarsBindingKey)
-
-	if err != nil {
-		return errors.Wrap(err, "userConsumer.CreateExchangeAndQueue")
-	}
-
-	defer avatarChan.Close()
-
-	userConsumer.RunConsumers(ctx, cancel)
-
+	// Initialize gRPC server
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
-
 	if err != nil {
 		return err
 	}
-
 	defer l.Close()
 
-	server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle: s.cfg.GRPCServer.MaxConnectionIdle * time.Minute,
-		Timeout:           s.cfg.GRPCServer.Timeout * time.Second,
-		MaxConnectionAge:  s.cfg.GRPCServer.MaxConnectionAge * time.Minute,
-		Time:              s.cfg.GRPCServer.Timeout * time.Minute,
-	}),
+	server := grpc.NewServer(
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			MaxConnectionIdle: s.cfg.GRPCServer.MaxConnectionIdle * time.Minute,
+			Timeout:           s.cfg.GRPCServer.Timeout * time.Second,
+			MaxConnectionAge:  s.cfg.GRPCServer.MaxConnectionAge * time.Minute,
+			Time:              s.cfg.GRPCServer.Timeout * time.Minute,
+		}),
 		grpc.ChainUnaryInterceptor(
 			grpc_ctxtags.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
@@ -129,7 +114,7 @@ func (s *Server) Run() error {
 		),
 	)
 
-	userService := userGRPC.NewUserGRPCService(userUseCase, s.logger, validate)
+	userService := userGRPC.NewUserGRPCService(userUseCase, s.logger, validate, kafkaProducer)
 	userGRPCService.RegisterUserServiceServer(server, userService)
 	userGRPCService.RegisterHelloServiceServer(server, new(HelloService))
 	grpc_prometheus.Register(server)
@@ -144,7 +129,6 @@ func (s *Server) Run() error {
 	}
 
 	quite := make(chan os.Signal, 1)
-
 	signal.Notify(quite, os.Interrupt, syscall.SIGTERM)
 
 	select {
@@ -155,46 +139,29 @@ func (s *Server) Run() error {
 	}
 
 	s.logger.Info("Server Exited Properly")
-
 	server.GracefulStop()
-
 	s.logger.Info("Server Exited Properly")
 
 	return nil
 }
 
 func (s *Server) RunGateway() error {
-
 	ctx, cancel := context.WithCancel(context.Background())
-
 	defer cancel()
 	validate := validator.New()
 
-	userPublisher, err := rabbitmq.NewUserPublisher(s.cfg, s.logger)
-
-	if err != nil {
-		return errors.Wrap(err, "rabbitmq.NewUserPubliser")
-	}
-
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userRedisRepository := repository.NewUserRedisRepository(s.redisConn, userCachePrefix, userCacheDuration)
-	userUseCase := usecase.NewUserUseCase(userPGRepository, s.logger, userRedisRepository, userPublisher)
+	userUseCase := usecase.NewUserUseCase(userPGRepository, s.logger, userRedisRepository)
 
-	userConsumer := rabbitmq.NewUserConsumer(s.cfg, s.logger, userUseCase)
+	// Initialize Kafka producer
+	kafkaProducer := kafka.NewUserProducer(s.logger, s.cfg)
+	kafkaProducer.Run()
+	defer kafkaProducer.Close()
 
-	if err := userConsumer.Dial(); err != nil {
-		return errors.Wrap(err, "userConsumer.Dial")
-	}
-
-	avatarChan, err := userConsumer.CreateExchangeAndQueue(rabbitmq.UserExchange, rabbitmq.AvatarQueueName, rabbitmq.AvatarsBindingKey)
-
-	if err != nil {
-		return errors.Wrap(err, "userConsumer.CreateExchangeAndQueue")
-	}
-
-	defer avatarChan.Close()
-
-	userConsumer.RunConsumers(ctx, cancel)
+	// Initialize Kafka consumer
+	userConsumerGroup := kafka.NewUserConsumerGroup(s.cfg.Kafka.Brokers, kafkaGroupID, s.cfg, s.logger, userUseCase, validate)
+	go userConsumerGroup.CreateUserConsumer(ctx, cancel, kafkaGroupID, kafka.CreateUserTopic, kafka.CreateUsertWorkers)
 
 	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
@@ -206,23 +173,20 @@ func (s *Server) RunGateway() error {
 	})
 	grpcMux := runtime.NewServeMux(jsonOption)
 
-	userService := userGRPC.NewUserGRPCService(userUseCase, s.logger, validate)
+	userService := userGRPC.NewUserGRPCService(userUseCase, s.logger, validate, kafkaProducer)
 
-	err = userGRPCService.RegisterUserServiceHandlerServer(ctx, grpcMux, userService)
+	err := userGRPCService.RegisterUserServiceHandlerServer(ctx, grpcMux, userService)
 	if err != nil {
 		s.logger.Errorf("cannot register handler server : %v", err)
 	}
 
 	mux := http.NewServeMux()
-
 	mux.Handle("/", grpcMux)
 
 	l, err := net.Listen("tcp", s.cfg.HttpServer.Port)
-
 	if err != nil {
 		return err
 	}
-
 	defer l.Close()
 
 	go func() {
@@ -231,7 +195,6 @@ func (s *Server) RunGateway() error {
 	}()
 
 	quite := make(chan os.Signal, 1)
-
 	signal.Notify(quite, os.Interrupt, syscall.SIGTERM)
 
 	select {
