@@ -18,3 +18,5 @@ proto:
     --go-grpc_out=pb --go-grpc_opt=paths=source_relative \
 	--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
     proto/*.proto
+mg_user_db:
+	migrate -database postgresql://postgres:wEkkDLzNNjGUuecxUqAHUizVVchCvBhX@monorail.proxy.rlwy.net:23962/railway -path user/migrations up
