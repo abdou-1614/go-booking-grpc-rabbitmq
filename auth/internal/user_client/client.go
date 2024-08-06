@@ -1,7 +1,7 @@
 package userclient
 
 import (
-	"Go-grpc/config"
+	"auth/config"
 	"auth/internal/interceptors"
 	"context"
 	"time"
@@ -25,7 +25,7 @@ func NewUserServiceConn(ctx context.Context, cf *config.Config, interceptor *int
 
 	userGRPCConn, err := grpc.DialContext(
 		ctx,
-		cf.GRPCServer.SessionGrpcServicePort,
+		cf.GRPCServer.UserGrpcServicePort,
 		grpc.WithUnaryInterceptor(traceutils.OpenTracingClientInterceptor(interceptor.GetTracer())),
 		grpc.WithUnaryInterceptor(interceptor.GetInterceptor()),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
